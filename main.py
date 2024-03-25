@@ -3,6 +3,8 @@ from urllib.parse import urlparse, parse_qs
 import os
 import json
 from datetime import datetime
+import socket
+import threading
 
 class HttpHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -25,9 +27,6 @@ class HttpHandler(BaseHTTPRequestHandler):
         
         if self.path == '/submit':
             self.handle_form_submission(form_data)
-            self.send_response(302)
-            self.send_header('Location', '/message')
-            self.end_headers()
         else:
             self.send_error(404, 'Not Found')
 
@@ -68,6 +67,11 @@ class HttpHandler(BaseHTTPRequestHandler):
             }
             
             self.save_to_json(data)
+
+            # Відправка відповіді клієнту з перенаправленням на сторінку message з параметром "success"
+            self.send_response(302)
+            self.send_header('Location', '/message?success')
+            self.end_headers()
         else:
             self.send_error(400, 'Bad Request')
 
@@ -81,11 +85,49 @@ class HttpHandler(BaseHTTPRequestHandler):
             json.dump(data, json_file, indent=4)
             json_file.write('\n')
 
-def run(server_class=HTTPServer, handler_class=HttpHandler):
+class SocketServerThread(threading.Thread):
+    def __init__(self, host, port):
+        threading.Thread.__init__(self)
+        self.host = host
+        self.port = port
+
+    def run(self):
+        UDP_IP = self.host
+        UDP_PORT = self.port
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind((UDP_IP, UDP_PORT))
+
+        while True:
+            data, addr = sock.recvfrom(1024)
+            message = json.loads(data.decode('utf-8'))
+            self.handle_message(message)
+
+    def handle_message(self, message):
+        if 'username' in message and 'message' in message:
+            username = message['username']
+            message_text = message['message']
+            
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+            data = {
+                timestamp: {
+                    'username': username,
+                    'message': message_text
+                }
+            }
+            
+            HttpHandler().save_to_json(data)
+
+def run_http_server(server_class=HTTPServer, handler_class=HttpHandler):
     server_address = ('', 3000)
     httpd = server_class(server_address, handler_class)
     print('Starting HTTP server on port 3000...')
     httpd.serve_forever()
 
+def run_socket_server():
+    server_thread = SocketServerThread('127.0.0.1', 5000)
+    server_thread.start()
+
 if __name__ == '__main__':
-    run()
+    run_http_server()
+    run_socket_server()
