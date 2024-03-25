@@ -16,6 +16,8 @@
         <input type="submit" value="Submit">
         <button type="button" id="resetButton">Reset</button>
         <button type="button" id="mainPageButton">Main page</button>
+
+        <div id="message-container"></div>
     </form>
 
     <script>
@@ -26,6 +28,18 @@
         document.getElementById('mainPageButton').addEventListener('click', function() {
             window.location.href = '/'; // Redirect to index.html
         });
+    </script>
+
+    <script>
+        // Отримати URL поточної сторінки
+        var currentPageUrl = window.location.href;
+
+        // Перевірити, чи URL містить параметр "success"
+        if (currentPageUrl.includes("?success")) {
+            // Якщо так, відобразити повідомлення
+            var messageContainer = document.getElementById("message-container");
+            messageContainer.innerText = "Message submitted successfully!";
+        }
     </script>
 </body>
 </html>
