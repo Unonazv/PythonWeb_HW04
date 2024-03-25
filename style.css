@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700&subset=cyrillic');
+
+body {
+    margin: 20;
+    padding: 10;
+    font-family: 'Roboto', Arial, Helvetica, sans-serif;
+    background-color: #d0f1f6;
+    /* color: #f5f7e2; */
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+.visuallyhidden:not(:focus):not(:active) {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    border: 0;
+    padding: 0;
+
+    white-space: nowrap;
+
+    clip-path: inset(100%);
+    clip: rect(0 0 0 0);
+    overflow: hidden;
+}
+
+.form-signin {
+    width: 100%;
+    max-width: 330px;
+    padding: 15px;
+    margin: auto;
+}
+
+form {
+    margin-left: 20px; /* Додаємо відступ зліва для всієї форми */
+}
+
+label {
+    display: inline-block; /* Робимо елементи label блоковими, щоб можна було застосувати властивості margin */
+    margin-bottom: 10px; /* Додаємо відступ знизу до назв полів */
+}
+
+input[type="text"],
+input[type="email"],
+textarea {
+    margin-bottom: 10px; /* Додаємо відступ знизу до самих полів вводу */
+}
